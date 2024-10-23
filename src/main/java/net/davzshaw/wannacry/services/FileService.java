@@ -24,6 +24,31 @@ public class FileService {
         }
     }
 
+    public String getTemperatureFromFile() throws IOException {
+        File file = new File(STORAGE_DIR + "temperature.txt");
+        if (!file.exists()) {
+            throw new IOException("File not found: " + file.getAbsolutePath());
+        }
+
+        byte[] fileContent = new byte[(int) file.length()];
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.read(fileContent);
+        }
+
+        return new String(fileContent);
+    }
+
+    public void saveTemperature(String temperature) throws IOException {
+        File storageDir = new File(STORAGE_DIR);
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(STORAGE_DIR + "temperature.txt")) {
+            fos.write(temperature.toString().getBytes());
+        }
+    }
+
     public void saveBase64ToFile(String base64Text) throws IOException {
 
         byte[] data = Base64.getDecoder().decode(base64Text);

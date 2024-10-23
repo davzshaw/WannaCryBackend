@@ -17,7 +17,7 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    @DeleteMapping("/clear")
+    @DeleteMapping("/clearfiles")
     public ResponseEntity<String> clear() {
         try {
             fileService.clearFile();
@@ -33,8 +33,42 @@ public class FileController {
         }
     }
     
+    @PostMapping("/uploadtemperature/{temp}")
+    public ResponseEntity<String> saveTemperature(@PathVariable String temp) {
+        try {
+            
+            fileService.saveTemperature(temp);
 
-    @GetMapping("/download")
+            return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body("Temperature saved successfully");
+
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error trying to save temperature: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/downloadtemperature")
+    public ResponseEntity<String> downloadTemperature() {
+        try {
+            String temperature = fileService.getTemperatureFromFile();
+
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("{\"temperature\": " + temperature + "}");
+
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Error trying to read temperature: " + e.getMessage());
+        }
+    }
+
+    
+
+    @GetMapping("/downloadsound")
     public ResponseEntity<String> downloadBase64() {
         try {
             String base64 = fileService.getBase64FromFile("sound.mp3");
@@ -50,7 +84,7 @@ public class FileController {
         }
     }
 
-    @PostMapping("/upload")
+    @PostMapping("/uploadsound")
     public ResponseEntity<String> uploadBase64(@RequestBody Base64Request base64Request) {
         try {
             fileService.saveBase64ToFile(base64Request.getBase64());
