@@ -6,6 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import net.davzshaw.wannacry.services.FileService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api")
@@ -13,6 +16,23 @@ public class FileController {
 
     @Autowired
     private FileService fileService;
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clear() {
+        try {
+            fileService.clearFile();
+
+            return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Files cleared successfully");
+
+        } catch (Exception e) {
+            return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Error trying to clear files: " + e.getMessage());
+        }
+    }
+    
 
     @GetMapping("/download")
     public ResponseEntity<String> downloadBase64() {

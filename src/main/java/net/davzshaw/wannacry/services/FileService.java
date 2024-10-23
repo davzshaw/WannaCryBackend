@@ -13,6 +13,17 @@ public class FileService {
 
     private final String STORAGE_DIR = "src/main/java/net/davzshaw/wannacry/storage/";
 
+    public void clearFile() throws IOException {
+        File storageDir = new File(STORAGE_DIR);
+        if (storageDir.exists() && storageDir.isDirectory()) {
+            for (File file : storageDir.listFiles()) {
+                if (!file.isDirectory()) {
+                    file.delete();
+                }
+            }
+        }
+    }
+
     public void saveBase64ToFile(String base64Text) throws IOException {
 
         byte[] data = Base64.getDecoder().decode(base64Text);
