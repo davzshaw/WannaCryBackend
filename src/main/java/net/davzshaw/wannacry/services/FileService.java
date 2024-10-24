@@ -11,69 +11,73 @@ import java.util.Base64;
 @Service
 public class FileService {
 
-    private final String STORAGE_DIR = "src/main/java/net/davzshaw/wannacry/storage/";
+  private final String STORAGE_DIR = "src/main/java/net/davzshaw/wannacry/storage/";
 
-    public void clearFile() throws IOException {
-        File storageDir = new File(STORAGE_DIR);
-        if (storageDir.exists() && storageDir.isDirectory()) {
-            for (File file : storageDir.listFiles()) {
-                if (!file.isDirectory()) {
-                    file.delete();
-                }
-            }
+  public void clearFile() throws IOException {
+    File storageDir = new File(STORAGE_DIR);
+    if (storageDir.exists() && storageDir.isDirectory()) {
+      for (File file : storageDir.listFiles()) {
+        if (!file.isDirectory()) {
+          file.delete();
         }
+      }
+    }
+  }
+
+  // Post
+  public void saveTemperature(String temperature) throws IOException {
+    File storageDir = new File(STORAGE_DIR);
+    if (!storageDir.exists()) {
+      storageDir.mkdirs();
     }
 
-    public String getTemperatureFromFile() throws IOException {
-        File file = new File(STORAGE_DIR + "temperature.txt");
-        if (!file.exists()) {
-            throw new IOException("File not found: " + file.getAbsolutePath());
-        }
+    try (FileOutputStream fos = new FileOutputStream(STORAGE_DIR + "temperature.txt")) {
+      fos.write(temperature.toString().getBytes());
+    }
+  }
 
-        byte[] fileContent = new byte[(int) file.length()];
-        try (FileInputStream fis = new FileInputStream(file)) {
-            fis.read(fileContent);
-        }
+  // Post
+  public void saveBase64ToFile(String base64Text) throws IOException {
 
-        return new String(fileContent);
+    byte[] data = Base64.getDecoder().decode(base64Text);
+
+    File storageDir = new File(STORAGE_DIR);
+    if (!storageDir.exists()) {
+      storageDir.mkdirs();
     }
 
-    public void saveTemperature(String temperature) throws IOException {
-        File storageDir = new File(STORAGE_DIR);
-        if (!storageDir.exists()) {
-            storageDir.mkdirs();
-        }
+    try (FileOutputStream fos = new FileOutputStream(STORAGE_DIR + "sound.mp3")) {
+      fos.write(data);
+    }
+  }
 
-        try (FileOutputStream fos = new FileOutputStream(STORAGE_DIR + "temperature.txt")) {
-            fos.write(temperature.toString().getBytes());
-        }
+  // Get
+  public String getBase64FromFile(String fileName) throws IOException {
+    File file = new File(STORAGE_DIR + fileName);
+    if (!file.exists()) {
+      throw new IOException("File not found: " + file.getAbsolutePath());
     }
 
-    public void saveBase64ToFile(String base64Text) throws IOException {
-
-        byte[] data = Base64.getDecoder().decode(base64Text);
-
-        File storageDir = new File(STORAGE_DIR);
-        if (!storageDir.exists()) {
-            storageDir.mkdirs();
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(STORAGE_DIR + "sound.mp3")) {
-            fos.write(data);
-        }
+    byte[] fileContent = new byte[(int) file.length()];
+    try (FileInputStream fis = new FileInputStream(file)) {
+      fis.read(fileContent);
     }
 
-    public String getBase64FromFile(String fileName) throws IOException {
-        File file = new File(STORAGE_DIR + fileName);
-        if (!file.exists()) {
-            throw new IOException("File not found: " + file.getAbsolutePath());
-        }
+    return Base64.getEncoder().encodeToString(fileContent);
+  }
 
-        byte[] fileContent = new byte[(int) file.length()];
-        try (FileInputStream fis = new FileInputStream(file)) {
-            fis.read(fileContent);
-        }
-
-        return Base64.getEncoder().encodeToString(fileContent);
+  // Get
+  public String getTemperatureFromFile() throws IOException {
+    File file = new File(STORAGE_DIR + "temperature.txt");
+    if (!file.exists()) {
+      throw new IOException("File not found: " + file.getAbsolutePath());
     }
+
+    byte[] fileContent = new byte[(int) file.length()];
+    try (FileInputStream fis = new FileInputStream(file)) {
+      fis.read(fileContent);
+    }
+
+    return new String(fileContent);
+  }
 }
